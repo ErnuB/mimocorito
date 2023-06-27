@@ -1,13 +1,15 @@
 <script>
-    export let images = [
-      { path: "/img/image1.jpg", description: "Description 1" },
-      { path: "/img/image2.jpg", description: "Description 2" },
-      { path: "/img/image3.jpg", description: "Description 3" },
-      { path: "/img/image4.jpg", description: "Description 1" },
-      { path: "/img/image5.jpg", description: "Description 2" },
-      { path: "/img/image6.jpg", description: "Description 3" }
-    ];  
- 
+  export let images = [
+    { path: "/img/mocorito-entrada.jpg", description: "Mocorito Pueblo Mágico" },
+    { path: "/img/collage2.jpg", description: "Restaurante Mi Mocorito" },
+    { path: "/img/mocorito-viejo2.jpg", description: "Mocorito Viejo" },
+    { path: "/img/letras.jpg", description: "Letras Mocorito" },
+    { path: "/img/restaurante.jpg", description: "Mi Mocorito" },
+    { path: "/img/mocorito-viejo.jpg", description: "Mocorito Viejo" },
+    { path: "/img/estatuas.jpg", description: "Agustina Ramirez" },
+    { path: "/img/iglesia.jpg", description: "Iglesia" },
+  ];
+
   import { onMount, createEventDispatcher } from "svelte";
 
   let currentIndex = 0;
@@ -53,7 +55,7 @@
     width: 100%;
     object-fit: cover;
     max-height: 150%;
-    transition: transform 0.3s ease-out;
+    transition: transform 1s ease-out;
     position: absolute;
     top: 0;
     left: 0;
@@ -70,15 +72,13 @@
   .next {
     transform: translateX(100%);
     z-index: 1;
+    transition-delay: 0.5s;
   }
 
   .previous {
     transform: translateX(-100%);
-    z-index: 1;
-  }
-
-  .transitioning {
-    transition: transform 2s ease-out;
+    z-index: 3; /* Adjusted to a higher value */
+    transition-delay: 0.5s;
   }
 </style>
 
@@ -90,7 +90,6 @@
       class:current={index === currentIndex}
       class:next={index === (currentIndex + 1) % images.length}
       class:previous={index === (currentIndex - 1 + images.length) % images.length}
-      class:transitioning={index === currentIndex || index === (currentIndex + 1) % images.length || index === (currentIndex - 1 + images.length) % images.length}
     />
   {/each}
 </div>

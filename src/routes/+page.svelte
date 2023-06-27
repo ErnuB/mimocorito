@@ -1,15 +1,25 @@
 <script>
     import Carrusel from "./Carrusel.svelte";
-    import Menu from "./Menu.svelte";
-    import { fly } from "svelte/transition";
-    export let open = false
-    export let onClick = () => {
-      open = !open
+    import Navbar from "./Navbar.svelte";
+    export let toggleNav
+    import Modal from "./Modal.svelte";
+
+    let isOverlayOpen = false;
+    let selectedImage = null;
+    let alternativeText = null;
+
+    function openModal(imagen, altText) {
+        selectedImage = imagen;
+        alternativeText = altText;
+        isOverlayOpen = true;
     };
 
-    function closeMenu() {
-      open = false;
-    }
+    function closeModal() {
+        selectedImage = null;
+        alternativeText = null;
+        isOverlayOpen = false;
+    };
+
 
     let seccion = [
         {imagen:"/img/brush-azul.png", id:'antojitos', nombre:"Antojitos", descripcion:""},
@@ -22,7 +32,7 @@
     ];
 
     let items = [
-        { category: 'antojitos', nombre: 'Requesón Botanero', descripcion: "", precio: 60 },
+        {imagen:'/img/ayuntamiento.jpg', category: 'antojitos', nombre: 'Requesón Botanero', descripcion: "", precio: 60, hasImage:true },
         { category: 'antojitos', nombre: 'Quesito Picosito', descripcion: "", precio: 85 },
         { category: 'antojitos', nombre: 'Pan tostadito', descripcion: " Con mantequilla.", precio: 40 },
         { category: 'antojitos', nombre: 'Mini Pancakes', descripcion: "Espolvoreados  en azucar glass, platano, acompanados de mermelada de fresa y miel maple.", precio: 95 },
@@ -103,44 +113,34 @@
   </div>
   <Carrusel />
 </header>
-<section class="sticky top-0 flex flex-col bg-inherit z-30">
-  <div class="flex items-center bg-violet-950">
-    <div class="m-4 grow">
-      <a href="#">
-        <img src="/img/mimocorito.png" alt="Mi Mocorito" class="max-h-12">
-      </a>
-    </div>
-  <Menu {open} {onClick}/>
-  </div>
-  {#if open}
-  <nav class="flex flex-col items-center justify-center bg-yellow-400" transition:fly={{ y: -200, duration: 400}}>
-    {#each seccion as seccionItem}
-    <div class="relative my-4">
-      <a href="#{seccionItem.id}" on:click={closeMenu} class="m-4 relative text-lg z-30 font-mocorito font-semibold">{seccionItem.nombre}</a>
-      <img src="{seccionItem.imagen}" alt="Pincelada" class="absolute top-0 z-20 h-10 w-full pointer-events-none">
-    </div>
-    {/each}
-  </nav>
-  {/if}
-</section>
+<Navbar {toggleNav}/>
   <div class="p-4">
     <div class="flex gap-2 justify-center items-center">
     <img src="/img/mimocorito.ico" alt="Girasol" class="max-h-10">
     <p class="text-yellow-600 font-extrabold text-2xl italic text-center font-mocorito">El mejor mañanero con sabor a Mocorito</p>
     </div>
     {#each seccion as seccionItem}
+    <div id="{seccionItem.id}" class="scroll-mt-20"></div>
     <div class="bg-yellow-400 py-4 my-4">
     <div class="flex justify-center relative">
         <img src="{seccionItem.imagen}" alt="Pincelada" class="absolute h-8 w-full z-0">
-        <h2 class="text-xl font-bold z-10" id="{seccionItem.id}">{seccionItem.nombre}</h2>
+        <h2 class="text-xl font-bold z-10">{seccionItem.nombre}</h2>
     </div>
     <p class="text-sm mx-5">{seccionItem.descripcion}</p>
       {#each getFilteredItems(seccionItem.id) as item}
+      {#if item.hasImage}
+      <div class="flex gap-2 m-4 items-center">
+        <h3 class="text-lg font-semibold" on:click={() => openModal('/img/ayuntamiento.jpg','Cuernito con huevo')}>{item.nombre}&thinsp;<i class="fa-regular fa-image"></i></h3>
+        <div class="grow bg-violet-950 h-0.5"></div>
+        <p>${item.precio}</p>
+        </div>
+      {:else}
       <div class="flex gap-2 m-4 items-center">
         <h3 class="text-lg font-semibold">{item.nombre}</h3>
         <div class="grow bg-violet-950 h-0.5"></div>
         <p>${item.precio}</p>
-    </div>
+        </div>
+      {/if}
         <p class="ml-5 mr-16 -mt-4 text-sm text-justify">{item.descripcion}</p>
       {/each}
     </div>
@@ -148,10 +148,10 @@
     {/each}
     
 </div>
-<div class="bg-white rounded-full w-12 h-12 text-center fixed z-20 top-16 right-2">
+<div class="bg-white rounded-full w-12 h-12 text-center fixed z-20 top-24 right-2">
   <a href="https://wa.me/5216673718251" target="_blank"><i class="fa-brands fa-whatsapp text-4xl mt-1 text-green-600"></i></a>
 </div>
-<footer>
+<footer class="fixed bottom-0 z-50">
     <div class="flex p-4 bg-yellow-500">
         <a href="https://goo.gl/maps/xsDGc3mruRXqv6D16" class="text-sm w-2/3 border-r-2 px-2 border-violet-950"><i class="fa fa-location-dot"></i>&thinsp;Blvrd Dr Manuel Romero 93, Chapultepec, 80030 Culiacán Rosales, Sin.</a>
         <div class="flex flex-col mx-2 item-center w-1/3">
@@ -164,3 +164,6 @@
         </div>
     </div>
 </footer>
+{#if isOverlayOpen}
+  <Modal imageUrl={selectedImage} altText={alternativeText} closeModal={closeModal} />
+{/if}
